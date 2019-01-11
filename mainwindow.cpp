@@ -10,7 +10,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    OurModel=new QStandardItemModel(2,5,this);
+    OurModel=new QStandardItemModel(2,9,this); //5 zamieniłem na 9
     OurModel->setItem(0,0,new QStandardItem("1"));
     OurModel->setItem(0,1,new QStandardItem("Ala"));
     OurModel->setItem(0,2,new QStandardItem("Nowak"));
@@ -68,8 +68,17 @@ void MainWindow::on_pushButton_clicked()
     QString Discipline=ui->Dyscyplina->toPlainText();
     ui->Dyscyplina->setPlainText("");
 
+    if (Name.isEmpty() || Surname.isEmpty() )
+    {
+        return ;
+    }
+
+    Name=Name.toLower();
+    Name.replace(0,1,Name.at(0).toUpper());
+    Surname=Surname.toLower();
+    Surname.replace(0,1,Surname.at(0).toUpper());
+
     int LiczbaW=OurModel->rowCount();
-    qDebug()<<LiczbaW;
     LiczbaW++;
     OurModel->setRowCount(LiczbaW);
 
