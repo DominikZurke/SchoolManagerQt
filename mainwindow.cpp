@@ -3,6 +3,7 @@
 
 #include <QDebug>
 #include <QString>
+#include <QSqlQuery>
 
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -10,27 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    OurModel=new QStandardItemModel(2,9,this); //5 zamieniłem na 9
-    OurModel->setItem(0,0,new QStandardItem("1"));
-    OurModel->setItem(0,1,new QStandardItem("Ala"));
-    OurModel->setItem(0,2,new QStandardItem("Nowak"));
-    OurModel->setItem(0,3,new QStandardItem("1"));
-    OurModel->setItem(0,4,new QStandardItem("3,65"));
-    OurModel->setItem(0,5,new QStandardItem("200"));
-    OurModel->setItem(0,6,new QStandardItem("12.06.2019"));
-    OurModel->setItem(0,7,new QStandardItem("15"));
-    OurModel->setItem(0,8,new QStandardItem("Koszykówka"));
-
-    OurModel->setItem(1,0,new QStandardItem("2"));
-    OurModel->setItem(1,1,new QStandardItem("Ola"));
-    OurModel->setItem(1,2,new QStandardItem("Kowalska"));
-    OurModel->setItem(1,3,new QStandardItem("3"));
-    OurModel->setItem(1,4,new QStandardItem("4,5"));
-    OurModel->setItem(1,5,new QStandardItem("350"));
-    OurModel->setItem(1,6,new QStandardItem("12.06.2019"));
-    OurModel->setItem(1,7,new QStandardItem("30"));
-    OurModel->setItem(1,8,new QStandardItem(""));
-
+    OurModel=new QStandardItemModel(1,9,this);
 
     OurModel->setHorizontalHeaderItem(0,new QStandardItem(QString("ID")));
     OurModel->setHorizontalHeaderItem(1,new QStandardItem(QString("Imię")));
@@ -42,11 +23,53 @@ MainWindow::MainWindow(QWidget *parent) :
     OurModel->setHorizontalHeaderItem(7,new QStandardItem(QString("Pkt.")));
     OurModel->setHorizontalHeaderItem(8,new QStandardItem(QString("Dyscypina")));
     ui->tableView->setModel(OurModel);
+    ViewStudents();
+
 }
+
+
 
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::ViewStudents()
+{
+    QSqlDatabase m_db;
+    m_db = QSqlDatabase::addDatabase("QSQLITE");
+    m_db.setDatabaseName("C:/Users/domin/Desktop/SchoolManager/database.db");
+    if(m_db.open())
+        qDebug() << "baza danych otworzyla sie";
+    else
+        qDebug() << "baza danych nie otworzyla sie";
+
+    QSqlQuery vSelectQuery("SELECT id, name, surname, nr_group, mean, id_classes FROM students ORDER BY id;");
+    int i=0;
+    vSelectQuery.first();
+
+    do
+    {
+        QString id = vSelectQuery.value(0).toString();
+        QString name = vSelectQuery.value(1).toString();
+        QString surname = vSelectQuery.value(2).toString();
+        QString nr_group = vSelectQuery.value(3).toString();
+        QString mean = vSelectQuery.value(4).toString();
+        QString id_classes = vSelectQuery.value(5).toString();
+
+        OurModel->setItem(i,0,new QStandardItem(id));
+        OurModel->setItem(i,1,new QStandardItem(name));
+        OurModel->setItem(i,2,new QStandardItem(surname));
+        OurModel->setItem(i,3,new QStandardItem(nr_group));
+        OurModel->setItem(i,4,new QStandardItem(mean));
+        OurModel->setItem(i,5,new QStandardItem(id_classes));
+       // OurModel->setItem(i,6,new QStandardItem("12.06.2019"));
+       // OurModel->setItem(i,7,new QStandardItem("15"));
+       // OurModel->setItem(i,8,new QStandardItem("Koszykówka"));
+        i ++;
+    } while (vSelectQuery.next());
+
+    ui->tableView->setModel(OurModel);
 }
 
 void MainWindow::on_pushButton_clicked()
